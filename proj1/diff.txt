@@ -1,0 +1,5 @@
+34,35c34
+<             // read one byte from file
+<             fread(&num, sizeof(uint8_t), 1, file);
+---
+>             fscanf(file, "%d", &num);
