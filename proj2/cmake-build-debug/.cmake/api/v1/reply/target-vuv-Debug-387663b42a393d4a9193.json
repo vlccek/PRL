@@ -19,7 +19,7 @@
 		"files" : 
 		[
 			"CMakeLists.txt",
-			"/usr/share/cmake/Modules/FindMPI.cmake"
+			"/home/jvlk/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/share/cmake-3.30/Modules/FindMPI.cmake"
 		],
 		"nodes" : 
 		[
@@ -51,13 +51,13 @@
 			{
 				"command" : 3,
 				"file" : 1,
-				"line" : 1647,
+				"line" : 1646,
 				"parent" : 4
 			},
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 1235,
+				"line" : 1234,
 				"parent" : 5
 			}
 		]

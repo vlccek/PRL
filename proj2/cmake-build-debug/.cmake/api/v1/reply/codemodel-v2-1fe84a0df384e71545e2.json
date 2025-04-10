@@ -9,7 +9,7 @@
 					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
 					"minimumCMakeVersion" : 
 					{
-						"string" : "3.31"
+						"string" : "3.30"
 					},
 					"projectIndex" : 0,
 					"source" : ".",
@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "vuv::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-vuv-Debug-e6a076c4433096d464f2.json",
+					"jsonFile" : "target-vuv-Debug-387663b42a393d4a9193.json",
 					"name" : "vuv",
 					"projectIndex" : 0
 				}

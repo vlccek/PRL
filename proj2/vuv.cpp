@@ -8,8 +8,7 @@
 
 using Edge = std::pair<int, int>;
 
-int getNodeLevel(int nodeIndex)
-{
+int getNodeLevel(int nodeIndex) {
     return static_cast<int>(std::floor(std::log2(static_cast<double>(nodeIndex) + 1.0)));
 }
 
@@ -20,36 +19,31 @@ int getNodeLevel(int nodeIndex)
  * @param N Celkový počet uzlů ve stromě (předpokládáme > 0).
  * @return int Počet dětí (0, 1 nebo 2).
  */
-int countChildren(int parentIndex, int N)
-{
+int countChildren(int parentIndex, int N) {
     int LchildIdx = 2 * parentIndex + 1;
     int RchildIdx = 2 * parentIndex + 2;
 
     return (LchildIdx < N) + (RchildIdx < N);
 }
 
-int getCountOfRank()
-{
+int getCountOfRank() {
     int numProcesses;
     MPI_Comm_size(MPI_COMM_WORLD, &numProcesses);
     return numProcesses;
 }
 
-int getRank()
-{
+int getRank() {
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     return rank;
 }
 
-std::vector<std::pair<int, int>> eulerPath(int N, int id = 0)
-{
+std::vector<std::pair<int, int>> eulerPath(int N, int id = 0) {
     std::vector<std::pair<int, int>> result;
     int RchildIdx = (2 * id + 2 < N) ? 2 * id + 2 : -1;
     int LchildIdx = (2 * id + 1 < N) ? 2 * id + 1 : -1;
 
-    if (LchildIdx != -1)
-    {
+    if (LchildIdx != -1) {
         result.emplace_back(id, LchildIdx);
 
         auto tmpres = eulerPath(N, LchildIdx);
@@ -57,8 +51,7 @@ std::vector<std::pair<int, int>> eulerPath(int N, int id = 0)
         result.emplace_back(LchildIdx, id);
     }
 
-    if (RchildIdx != -1)
-    {
+    if (RchildIdx != -1) {
         result.emplace_back(id, RchildIdx);
 
         auto tmpres = eulerPath(N, RchildIdx);
@@ -70,11 +63,17 @@ std::vector<std::pair<int, int>> eulerPath(int N, int id = 0)
 }
 
 
-int main(int argc, char* argv[])
-{
+void removeUnValidEdges(std::vector<std::pair<int, int>> &managed_edges) {
+    auto tmp = std::remove_if(managed_edges.begin(), managed_edges.end(), [](const auto &edge) {
+        return edge.first == -1 || edge.second == -1;
+    }); // remove invalid edges
+
+}
+
+
+int main(int argc, char *argv[]) {
     MPI_Init(&argc, &argv);
-    if (argc != 2)
-    {
+    if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <binary_tree>" << std::endl;
         std::cerr << "Please provide a binary tree as a command line argument." << std::endl;
         std::cerr << "Example: " << argv[0] << "148" << std::endl;
@@ -101,18 +100,50 @@ int main(int argc, char* argv[])
     const int numOfChildrens = (LchildIdx < numProcesses) + (RchildIdx < numProcesses);
 
 
-    // etour
+    std::vector<std::vector<std::pair<int, int>>> edgeTreeReprezentation;
+    /* reprezetens tree as follow:
+     * var[0] = {(0, 1), (0, 2)} // means that thers 2 edges from 0 to 1 and 2
+     */
 
 
-    std::vector<std::pair<int, int>> localEulerPath = {
-        {parentId, rank},
-        {LchildIdx, rank},
-        {RchildIdx, rank},
+    for (int i = 0; i < numProcesses; ++i) {
+        int RchildIdx = (2 * rank + 2 < numProcesses) ? 2 * rank + 2 : -1;
+        int LchildIdx = (2 * rank + 1 < numProcesses) ? 2 * rank + 1 : -1;
+
+        std::vector<std::pair<int, int>> tmp;
+        if (LchildIdx == -1) {
+            tmp = {{i, LchildIdx}};
+        } else if (RchildIdx == -1) {
+            tmp = {{i, RchildIdx}};
+        } else {
+            tmp = {{i, LchildIdx},
+                   {i, RchildIdx}};
+        }
+        edgeTreeReprezentation.push_back(tmp);
+    }
+
+
+
+
+
+
+    std::vector<std::pair<int, int>> managed_edges = {
+            {parentId,  rank},
+            {LchildIdx, rank},
+            {RchildIdx, rank},
     };
-    auto tmp = std::remove_if(localEulerPath.begin(), localEulerPath.end(), [](const auto& edge)
-    {
-        return edge.first == -1 || edge.second == -1;
-    }); // remove invalid edges
+
+    removeUnValidEdges(managed_edges);
+
+    std::vector<int> weights = {};
+    for (auto &edge: managed_edges) {
+        if (edge.first > edge.second) {
+            weights.push_back(1);
+        } else {
+            weights.push_back(-1);
+        }
+    }
+
 
     std::vector<std::pair<int, int>> eulerPath;
     eulerPath.reserve(elementCount * 2); // preallocate space for the euler path
