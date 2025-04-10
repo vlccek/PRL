@@ -1,3 +1,0 @@
-/home/jvlk/projekty/MIT/PRL/proj2/cmake-build-debug/CMakeFiles/vuv.dir
-/home/jvlk/projekty/MIT/PRL/proj2/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/jvlk/projekty/MIT/PRL/proj2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
